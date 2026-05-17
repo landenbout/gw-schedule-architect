@@ -23,8 +23,6 @@ if "master_color_map" not in st.session_state:
     st.session_state.master_color_map = {}
 if "selected_sections" not in st.session_state:
     st.session_state.selected_sections = {}
-if "current_tab" not in st.session_state:
-    st.session_state.current_tab = "Selected Sections"
 
 # --- CORE FUNCTIONS ---
 
@@ -36,7 +34,6 @@ def fetch_gwu_data(subj_id, term_id):
     if cache_key in st.session_state.all_dept_data:
         return True
         
-    # Keeps the 'all campuses' upgrade (no campId=1 restriction)
     url = f"https://my.gwu.edu/mod/pws/print.cfm?termId={term_id}&subjId={subj_id}"
     headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)'}
     
@@ -166,7 +163,7 @@ def rgba_to_hex(rgba_tuple):
     return f"#{int(rgba_tuple[0]*255):02x}{int(rgba_tuple[1]*255):02x}{int(rgba_tuple[2]*255):02x}"
 
 # --- UI CONTROL LAYOUT ---
-st.title("📅 GWU Color-Coded Schedule Architect")
+st.title("📅 GWU Schedule Visualizer")
 
 # Row 1 Panel Controls
 col1, col1_sec, col2, col3, col4, col5 = st.columns([1.5, 1.0, 1.0, 1.0, 1.2, 1.5])
@@ -262,80 +259,59 @@ with sidebar_layout_col:
         df_filtered['UniqueKey'] = df_filtered['CourseNum'] + " - Sec " + df_filtered['Section']
         df_unique = df_filtered.drop_duplicates(subset=['UniqueKey']).sort_values(by=['CourseNum', 'Section'])
         
-        # Tabs layout
-        tab_selected, tab_unselected = st.tabs(["Selected Sections", "Unselected Sections"])
+        st.caption("Toggle checkboxes within each course tab to customize your timeline grid layout.")
         
-        with tab_selected:
-            st.session_state.current_tab = "Selected Sections"
-            st.caption("* Stars indicate Lecture requires Linked Discussion Element")
-            
-            for _, row in df_unique.iterrows():
-                ukey = row['UniqueKey']
-                cnum = row['CourseNum']
-                sec = row['Section']
-                star = " *" if (cnum in req_disc_set and get_section_num(sec) < 30) else ""
+        # --- DYNAMIC COURSE-BY-COURSE TAB GENERATION ---
+        unique_course_ids = sorted(df_unique['CourseNum'].unique())
+        course_tabs = st.tabs(unique_course_ids)
+        
+        for tab_idx, course_id in enumerate(unique_course_ids):
+            with course_tabs[tab_idx]:
+                df_course_sections = df_unique[df_unique['CourseNum'] == course_id]
                 
-                if ukey not in st.session_state.selected_sections:
-                    st.session_state.selected_sections[ukey] = True
-                
-                if st.session_state.selected_sections[ukey]:
-                    rgba_color = st.session_state.master_color_map.get(ukey, (0.5, 0.5, 0.5, 1.0))
-                    hex_bg = rgba_to_hex(rgba_color)
+                for _, row in df_course_sections.iterrows():
+                    ukey = row['UniqueKey']
+                    sec = row['Section']
+                    star = " *" if (course_id in req_disc_set and get_section_num(sec) < 30) else ""
+                    
+                    if ukey not in st.session_state.selected_sections:
+                        st.session_state.selected_sections[ukey] = True
+                        
+                    is_active = st.session_state.selected_sections[ukey]
                     
                     row_col1, row_col2 = st.columns([0.15, 0.85])
                     with row_col1:
                         st.markdown('<div style="padding-top: 20px;"></div>', unsafe_allow_html=True)
-                        st.session_state.selected_sections[ukey] = st.checkbox(
-                            f"chk_sel_val_{ukey}", 
-                            value=True, 
-                            key=f"chk_sel_{ukey}",
+                        is_checked = st.checkbox(
+                            f"chk_val_{ukey}", 
+                            value=is_active, 
+                            key=f"chk_node_{ukey}",
                             label_visibility="collapsed"
                         )
+                        st.session_state.selected_sections[ukey] = is_checked
+
+                    if is_checked:
+                        rgba_color = st.session_state.master_color_map.get(ukey, (0.5, 0.5, 0.5, 1.0))
+                        hex_bg = rgba_to_hex(rgba_color)
+                        text_color = "#000000"
+                        opacity_style = "opacity: 1.0;"
+                        border_style = "border: 1px solid #222222;"
+                        shadow_style = "box-shadow: 1px 1px 4px rgba(0,0,0,0.15);"
+                    else:
+                        hex_bg = "#f0f2f6"
+                        text_color = "#888888"
+                        opacity_style = "opacity: 0.55;"
+                        border_style = "border: 1px dashed #cccccc;"
+                        shadow_style = "box-shadow: none;"
+                        
                     with row_col2:
                         st.markdown(
                             f"""
-                            <div style="background-color: {hex_bg}; border: 1px solid #222222; 
-                                        padding: 4px 10px; border-radius: 4px; margin-top: 4px; box-shadow: 1px 1px 3px rgba(0,0,0,0.15);">
-                                <span style="font-weight: bold; font-size: 0.82rem; color: #111111; display: block; line-height: 1.1; margin-bottom: 3px;">{row['CourseTitle'][:40]}...</span>
-                                <span style="font-weight: 800; font-size: 0.88rem; color: #000000; display: block;">{cnum}{star} - Sec {sec}</span>
-                                <span style="font-size: 0.72rem; color: #111111; font-weight: bold; background-color: rgba(255,255,255,0.4); padding: 1px 4px; border-radius: 2px; display: inline-block; margin-top: 3px;">📅 {row['Days']} @ {row['Time']}</span>
-                            </div>
-                            """, 
-                            unsafe_allow_html=True
-                        )
-                    st.markdown('<div style="margin-bottom: 2px;"></div>', unsafe_allow_html=True)
-                    
-        with tab_unselected:
-            st.session_state.current_tab = "Unselected Sections"
-            for _, row in df_unique.iterrows():
-                ukey = row['UniqueKey']
-                cnum = row['CourseNum']
-                sec = row['Section']
-                
-                if not st.session_state.selected_sections.get(ukey, False):
-                    rgba_color = st.session_state.master_color_map.get(ukey, (0.5, 0.5, 0.5, 1.0))
-                    hex_bg = rgba_to_hex(rgba_tuple=rgba_color)
-                    
-                    row_col1, row_col2 = st.columns([0.15, 0.85])
-                    with row_col1:
-                        st.markdown('<div style="padding-top: 18px;"></div>', unsafe_allow_html=True)
-                        is_moved = st.checkbox(
-                            f"chk_unsel_val_{ukey}", 
-                            value=False, 
-                            key=f"chk_unsel_{ukey}",
-                            label_visibility="collapsed"
-                        )
-                        if is_moved:
-                            st.session_state.selected_sections[ukey] = True
-                            st.rerun()
-                    with row_col2:
-                        st.markdown(
-                            f"""
-                            <div style="background-color: {hex_bg}; border: 1px solid #222222; 
-                                        padding: 4px 10px; border-radius: 4px; margin-top: 2px;">
-                                <span style="font-size: 0.75rem; font-weight: 500; color: #222222; display: block; line-height: 1.1; margin-bottom: 2px;">{row['CourseTitle'][:40]}...</span>
-                                <span style="font-size: 0.82rem; font-weight: bold; color: #000000; display: block;">➕ Activate: {cnum} - Sec {sec}</span>
-                                <span style="font-size: 0.7rem; color: #222222; display: block; margin-top: 2px;">📅 {row['Days']} @ {row['Time']}</span>
+                            <div style="background-color: {hex_bg}; {border_style} {opacity_style} {shadow_style}
+                                        padding: 6px 10px; border-radius: 4px; margin-top: 4px; transition: all 0.1s ease-in-out;">
+                                <span style="font-weight: bold; font-size: 0.82rem; color: {text_color}; display: block; line-height: 1.1; margin-bottom: 3px;">{row['CourseTitle'][:40]}...</span>
+                                <span style="font-weight: 800; font-size: 0.88rem; color: {text_color}; display: block;">{course_id}{star} - Sec {sec}</span>
+                                <span style="font-size: 0.72rem; color: {text_color}; font-weight: bold; background-color: rgba(255,255,255,0.4); padding: 1px 4px; border-radius: 2px; display: inline-block; margin-top: 3px;">📅 {row['Days']} @ {row['Time']}</span>
                             </div>
                             """, 
                             unsafe_allow_html=True
