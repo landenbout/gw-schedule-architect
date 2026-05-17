@@ -215,7 +215,7 @@ if add_clicked and course_input:
 # Row 2 Filters and Settings Bar
 col_f1, col_f2, col_f3, col_f4 = st.columns(4)
 with col_f1:
-    exclude_mv = st.checkbox("Exclude 'MV' Sections", value=False)
+    exclude_mv = st.checkbox("Exclude Mount Vernon Sections", value=False)
 with col_f2:
     exclude_wl = st.checkbox("Exclude Waitlisted Sections", value=True)
 with col_f3:
