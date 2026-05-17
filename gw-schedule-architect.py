@@ -409,7 +409,7 @@ st.caption(
     "**⚠️ Disclaimer:** This website is an independent student utility project. It is **not affiliated with, endorsed by, or connected to** "
     "The George Washington University. All schedule records are gathered dynamically via public interfaces. Since class availability updates, "
     "room placements, and schedule adjustments shift frequently, always cross-reference and finalize your course arrangements directly inside "
-    "your official **GWeb Info System** portal."
+    "the official **GW Schedule of Classes** and **GW Bulletin**."
 )
 
 # --- MINIMALIST BLACK & WHITE FLOATING BUTTON & PURE MODAL POPUP ENGINE ---
@@ -531,7 +531,7 @@ st.markdown(
             <h3>ℹ️ Architect Instructions & Usage Guide</h3>
             <h5> <strong>📝 NOTE:</strong> This tool is designed to help you visualize timeline blocks alongside the official <strong>GW Schedule of Classes</strong> and <strong>GW Bulletin</strong>. It serves as a visual layout matrix and <u>does not</u> automatically account for prerequisites, corequisites, or program degree constraints.</h5>
             <ul>
-                <li><strong>Add a Course:</strong> Type a department shorthand code and number (e.g., <code>PSC 1001</code>) into the <b>Course ID</b> field, specify a calendar year, and click <code>Add Course to Matrix</code>.</li>
+                <li><strong>Add a Course:</strong> Type a department shorthand code and number (e.g., <code>PSC 1001</code>) into the <b>Course ID</b> field, specify a calendar year, and click <code>Add Course to Calendar</code>.</li>
                 <li><strong>Search by Section (Optional):</strong> Narrow down specific selections by providing a section key (e.g., <code>10</code> or <code>MV</code>) <i>before</i> clicking add. Leave it blank to load every possible section.</li>
                 <li><strong>Filter Layout:</strong> Use the <b>View Mode</b> menu dropdown grids or exclusions checkbars to hide waitlisted rows or Mount Vernon classes dynamically.</li>
                 <li><strong>Show or Hide Course Sections:</strong> Use the tabs in the sidebar to customize your schedule. Under <b>Selected Sections</b>, uncheck any class to instantly remove it from your calendar grid. To add an alternative section or bring a class back, switch to the <b>Unselected Sections</b> tab and check its box to reactivate it.</li>
