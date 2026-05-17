@@ -163,7 +163,21 @@ def rgba_to_hex(rgba_tuple):
     return f"#{int(rgba_tuple[0]*255):02x}{int(rgba_tuple[1]*255):02x}{int(rgba_tuple[2]*255):02x}"
 
 # --- UI CONTROL LAYOUT ---
-st.title("📅 GWU Schedule Visualizer")
+# Header Row Configuration for Title and Shortcut Links
+title_col, classes_link_col, bulletin_link_col = st.columns([2.5, 0.6, 0.5])
+
+with title_col:
+    st.markdown("<h1 style='margin:0; padding:0;'>📅 GWU Schedule Visualizer</h1>", unsafe_allow_html=True)
+
+with classes_link_col:
+    st.markdown('<div style="padding-top: 12px;"></div>', unsafe_allow_html=True)
+    st.link_button("🌐 Schedule of Classes", "https://my.gwu.edu/mod/pws/", use_container_width=True)
+
+with bulletin_link_col:
+    st.markdown('<div style="padding-top: 12px;"></div>', unsafe_allow_html=True)
+    st.link_button("📚 GW Bulletin", "https://bulletin.gwu.edu/", use_container_width=True)
+
+st.markdown('<div style="margin-bottom: 15px;"></div>', unsafe_allow_html=True)
 
 # Row 1 Panel Controls
 col1, col1_sec, col2, col3, col4, col5 = st.columns([1.5, 1.0, 1.0, 1.0, 1.2, 1.5])
@@ -251,6 +265,21 @@ if not df_filtered.empty:
 # --- SPLIT SCREEN VIEW ARCHITECTURE ---
 plot_layout_col, sidebar_layout_col = st.columns([2.8, 1.4])
 
+# FIX: Added dynamic layout padding overrides to clean up card boundary line cut-offs
+st.markdown(
+    """
+    <style>
+    div[data-testid="stHorizontalBlock"] > div:nth-child(2) {
+        max-height: 650px !important;
+        overflow-y: auto !important;
+        padding-right: 15px !important;
+        padding-bottom: 25px !important;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
 with sidebar_layout_col:
     st.subheader("📋 Sections Manager")
     req_disc_set = get_courses_requiring_discussion_global()
@@ -317,6 +346,9 @@ with sidebar_layout_col:
                             unsafe_allow_html=True
                         )
                     st.markdown('<div style="margin-bottom: 2px;"></div>', unsafe_allow_html=True)
+                
+                # FIX: Add an explicit structural layout margin block spacer padding layer at the absolute end of the course row list loop
+                st.markdown('<div style="padding-bottom: 20px;"></div>', unsafe_allow_html=True)
     else:
         st.info("No courses cached / matching filter constraints.")
 
@@ -534,7 +566,7 @@ st.markdown(
                 <li><strong>Add a Course:</strong> Type a department shorthand code and number (e.g., <code>PSC 1001</code>) into the <b>Course ID</b> field, specify a calendar year, and click <code>Add Course to Calendar</code>.</li>
                 <li><strong>Search by Section (Optional):</strong> Narrow down specific selections by providing a section key (e.g., <code>10</code> or <code>MV</code>) <i>before</i> clicking add. Leave it blank to load every possible section.</li>
                 <li><strong>Filter Layout:</strong> Use the <b>View Mode</b> menu dropdown grids or exclusions checkbars to hide waitlisted rows or Mount Vernon classes dynamically.</li>
-                <li><strong>Show or Hide Course Sections:</strong> Use the tabs in the sidebar to customize your schedule. Under <b>Selected Sections</b>, uncheck any class to instantly remove it from your calendar grid. To add an alternative section or bring a class back, switch to the <b>Unselected Sections</b> tab and check its box to reactivate it.</li>
+                <li><strong>Show or Hide Course Sections:</strong> Use the checkboxes within each individual course tab inside the <b>Sections Manager</b> sidebar. Checking a card activates it on the matrix layout, while unchecking it dims the card and removes its calendar block instantly.</li>
                 <li><strong>Export Deliverables:</strong> Download your layout cleanly as a structured spreadsheet data matrix (<code>.csv</code>) or capture timeline layouts as clear snapshots (<code>.png</code>).</li>
             </ul>
         </div>
