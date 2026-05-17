@@ -9,7 +9,7 @@ from datetime import datetime
 
 # --- CONFIGURATION & PAGE INITIALIZATION ---
 st.set_page_config(
-    page_title="GWU Color-Coded Schedule Architect",
+    page_title="GWU Schedule Visualiser",
     page_icon="📅",
     layout="wide"
 )
@@ -167,7 +167,7 @@ def rgba_to_hex(rgba_tuple):
 title_col, classes_link_col, bulletin_link_col = st.columns([2.5, 0.6, 0.5])
 
 with title_col:
-    st.markdown("<h1 style='margin:0; padding:0;'>📅 GWU Schedule Visualizer</h1>", unsafe_allow_html=True)
+    st.markdown("<h1 style='margin:0; padding:0;'>📅 GWU Schedule Visualiser</h1>", unsafe_allow_html=True)
 
 with classes_link_col:
     st.markdown('<div style="padding-top: 12px;"></div>', unsafe_allow_html=True)
@@ -558,7 +558,7 @@ st.markdown(
     <div id="architect-popup-guide" class="modal-overlay-container">
         <div class="modal-lightbox-card">
             <a href="#" class="modal-close-trigger">&times;</a>
-            <h3>ℹ️ Architect Instructions & Usage Guide</h3>
+            <h3>ℹ️ Visualiser Instructions & Usage Guide</h3>
             <h5> <strong>📝 NOTE:</strong> This tool is designed to help you visualize timeline blocks alongside the official <strong>GW Schedule of Classes</strong> and <strong>GW Bulletin</strong>. It serves as a visual layout matrix and <u>does not</u> automatically account for prerequisites, corequisites, or program degree constraints.</h5>
             <ul>
                 <li><strong>Add a Course:</strong> Type a department shorthand code and number (e.g., <code>PSC 1001</code>) into the <b>Course ID</b> field, specify a calendar year, and click <code>Add Course to Calendar</code>.</li>
