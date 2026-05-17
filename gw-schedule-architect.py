@@ -265,7 +265,6 @@ if not df_filtered.empty:
 # --- SPLIT SCREEN VIEW ARCHITECTURE ---
 plot_layout_col, sidebar_layout_col = st.columns([2.8, 1.4])
 
-# FIX: Added dynamic layout padding overrides to clean up card boundary line cut-offs
 st.markdown(
     """
     <style>
@@ -347,7 +346,6 @@ with sidebar_layout_col:
                         )
                     st.markdown('<div style="margin-bottom: 2px;"></div>', unsafe_allow_html=True)
                 
-                # FIX: Add an explicit structural layout margin block spacer padding layer at the absolute end of the course row list loop
                 st.markdown('<div style="padding-bottom: 20px;"></div>', unsafe_allow_html=True)
     else:
         st.info("No courses cached / matching filter constraints.")
@@ -451,7 +449,7 @@ st.markdown(
     /* Fixed Floating Minimalist Black Button */
     .floating-help-button {
         position: fixed;
-        bottom: 25px;
+        bottom: 55px; /* FIX: Bumped up from 25px to clear native Streamlit overlays safely */
         right: 25px;
         background-color: #000000;
         color: #FFFFFF !important;
