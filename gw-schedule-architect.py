@@ -185,7 +185,7 @@ with col4:
 
 with col5:
     st.write(" ") 
-    add_clicked = st.button("➕ Add Course to Matrix", use_container_width=True)
+    add_clicked = st.button("➕ Add Course to Calendar", use_container_width=True)
 
 # Add Course Trigger Logic
 if add_clicked and course_input:
